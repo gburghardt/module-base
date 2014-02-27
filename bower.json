@@ -7,21 +7,8 @@
 	"version": "1.0.0",
 	"license": "MIT",
 	"repository": { "type": "git", "url": "https://github.com/gburghardt/module-base.git" },
-	"main": [
-	],
-	"dependencies": {
-		"inherit.js": "1.0.0",
-		"dom_event_delegator": "1.1.1",
-		"hash": "1.0.1",
-		"callbacks": "1.0.0",
-		"cerealizer": "0.0.1",
-		"beacon": "1.0.0",
-		"element_store": "1.0.2",
-		"reaper": "1.0.0",
-		"module-manager": "file:///c/Users/BurghardtG/code/git/module/.git#manager_only"
-	},
+	"main": "src/module/base.js",
 	"devDependencies": {
-		"jasmine": "~2.0",
-		"mocking_bird":"~0.0.1"
+		"jasmine": "file:///c/Users/BurghardtG/code/git/jasmine/.git#data_driven_tests_temp"
 	}
 }

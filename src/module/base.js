@@ -2,71 +2,143 @@
 
 var _guid = 0;
 
-Module.Base = Object.extend({
+function Base() {
+	this.guid = ++_guid;
+	this.options = {};
+};
 
-	includes: [
-		Callbacks.Utils,
-		Beacon.ApplicationEvents,
-		Beacon.Notifications,
-		ElementStore.Utils
-	],
+Base.unregister = function unregister(module) {
+	if (!Module.manager) {
+		return;
+	}
 
-	self: {
-		manager: null,
+	Module.manager.unregister(module);
+};
 
-		getManager: function getManager() {
-			return Module.manager;
-		},
+Base.prototype = {
 
-		unregister: function unregister(module) {
-			if (Module.manager) {
-				Module.manager.unregisterModule(module);
-			}
+	document: null,
+
+	element: null,
+
+	guid: null,
+
+	window: null,
+
+	constructor: Base,
+
+	init: function init(elementOrId, options) {
+		if (elementOrId) {
+			this.setElement(elementOrId);
 		}
+
+		if (options) {
+			this.setOptions(options);
+		}
+
+		return this;
 	},
 
+	destructor: function destructor(keepElement) {
+		Base.unregister(this);
+
+		if (!keepElement && this.element && this.element.parentNode) {
+			this.element.parentNode.removeChild(this.element);
+		}
+
+		this.element = this.options = this.document = this.window = null;
+	},
+
+	focus: function focus(anything) {
+		var element,
+			typeRegex = /checkbox|radio|submit|button|image|reset/,
+		    selector = [
+		    	"textarea",
+		    	"select",
+		    	"input[type=text]",
+		    	"input[type=password]",
+		    	"input[type=checkbox]",
+		    	"input[type=radio]",
+		    	"input[type=email]",
+		    	"input[type=number]",
+		    	"input[type=search]",
+		    	"input[type=url]"
+		    ];
+
+		if (anything) {
+			selector.push(
+				"a",
+				"button",
+				"input[type=submit]",
+				"input[type=button]",
+				"input[type=image]",
+				"input[type=reset]"
+			);
+		}
+
+		element = this.element.querySelector(selector.join(", "));
+
+		if (element && element.focus) {
+			element.focus();
+
+			if (element.select && !typeRegex.test(element.type)) {
+				element.select();
+			}
+		}
+
+		element = null;
+	},
+
+	_loading: function _loading(element) {
+		(element || this.element).classList.add("loading");
+		element = null;
+	},
+
+	_loaded: function _loaded(element) {
+		(element || this.element).classList.remove("loading");
+		element = null;
+	},
+
+	setElement: function setElement(elementOrId) {
+		this.element = typeof elementOrId === "string"
+		             ? document.getElementById(elementOrId)
+		             : elementOrId;
+
+		if (!this.element) {
+			throw new Error("Could not find element: " + elementOrId);
+		}
+
+		this.document = this.element.ownerDocument;
+		this.window = this.document.defaultView || this.document.parentWindow;
+	},
+
+	setOptions: function setOptions(overrides) {
+		for (var key in overrides) {
+			if (overrides.hasOwnProperty(key)) {
+				this.options[key] = overrides[key];
+			}
+		}
+
+		overrides = null;
+	}
+
+};
+
+Module.Base = Base;
+
+
+
+
+
+/*
+Module.Base = Object.extend({
+
 	prototype: {
-
-		actions: {
-			click: [
-				"cancel"
-			]
-		},
-
-		callbacks: {
-			afterReady: [
-				"_loaded"
-			]
-		},
-
-		delegator: null,
-
-		document: null,
-
-		element: null,
-
-		elementStore: {},
-
-		guid: null,
-
-		options: {
-			actionPrefix: null,
-			defaultModule: false,
-		},
-
-		window: null,
-
-		initialize: function initialize() {
-			this.guid = _guid++;
-		},
 
 		init: function init(elementOrId, options) {
 			if (elementOrId) {
 				this.setElement(elementOrId);
 			}
-
-			this.document = this.element.ownerDocument;
-			this.window = this.document.defaultView || this.document.parentWindow;
 
 			if (!this.hasOwnProperty("options")) {
 				this.options = new Hash();
@@ -134,46 +206,6 @@ Module.Base = Object.extend({
 			event = element = params = null;
 		},
 
-		focus: function focus(anything) {
-			var els = this.element.getElementsByTagName("*");
-			var i = 0, length = els.length, el;
-
-			if (anything) {
-				for (i; i < length; i++) {
-					el = els[i];
-
-					if (el.tagName === "A" || el.tagName === "BUTTON" || el.tagName === "TEXTAREA" || el.tagName === "SELECT" || (el.tagName === "INPUT" && el.type !== "hidden")) {
-						if (el.focus) {
-							el.focus();
-						}
-
-						if (el.select) {
-							el.select();
-						}
-
-						break;
-					}
-				}
-			}
-			else {
-				for (i; i < length; i++) {
-					el = els[i];
-
-					if (el.tagName === "TEXTAREA" || el.tagName === "SELECT" || (el.tagName === "INPUT" && el.type !== "hidden")) {
-						if (el.focus) {
-							el.focus();
-						}
-
-						if (el.select) {
-							el.select();
-						}
-
-						break;
-					}
-				}
-			}
-		},
-
 		_ready: function _ready() {
 
 		},
@@ -219,38 +251,10 @@ Module.Base = Object.extend({
 			}
 		},
 
-		_loading: function _loading(element) {
-			element = element || this.element;
-			element.className += " loading";
-			element = null;
-		},
-
-		_loaded: function _loaded(element) {
-			element = element || this.element;
-			element.className = element.className.replace(/(^|\s+)(loading)(\s+|$)/, "$1$3").replace(/[\s]{2,}/g, " ");
-			element = null;
-		},
-
-		setElement: function setElement(elementOrId) {
-			this.element = typeof elementOrId === "string" ? document.getElementById(elementOrId) : elementOrId;
-
-			if (!this.element) {
-				throw new Error("Could not find element: " + elementOrId);
-			}
-		},
-
-		setOptions: function setOptions(overrides) {
-			if (!this.hasOwnProperty("options")) {
-				this.options = new Hash(overrides);
-			}
-			else {
-				this.options.merge(overrides);
-			}
-		}
-
 	}
 
 });
+*/
 
 // Make globally available
 g.Module = Module;

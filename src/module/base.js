@@ -7,6 +7,10 @@ function Base() {
 	this.options = {};
 };
 
+Base.setDefaultModule = function setDefaultModule(module) {
+	Module.manager.setDefaultModule(module);
+};
+
 Base.unregister = function unregister(module) {
 	if (!Module.manager) {
 		return;
@@ -34,6 +38,10 @@ Base.prototype = {
 
 		if (options) {
 			this.setOptions(options);
+		}
+
+		if (this.options.defaultModule) {
+			Base.setDefaultModule(this);
 		}
 
 		return this;

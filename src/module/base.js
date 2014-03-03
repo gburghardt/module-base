@@ -3,9 +3,8 @@
 var _guid = 0;
 
 function Base() {
-	this.guid = ++_guid;
-	this.options = {};
-};
+	this.initialize();
+}
 
 Base.setDefaultModule = function setDefaultModule(module) {
 	Module.manager.setDefaultModule(module);
@@ -30,6 +29,11 @@ Base.prototype = {
 	window: null,
 
 	constructor: Base,
+
+	initialize: function initialize() {
+		this.guid = _guid++;
+		this.options = {};
+	},
 
 	init: function init(elementOrId, options) {
 		if (elementOrId) {
@@ -133,136 +137,6 @@ Base.prototype = {
 };
 
 Module.Base = Base;
-
-
-
-
-
-/*
-Module.Base = Object.extend({
-
-	prototype: {
-
-		init: function init(elementOrId, options) {
-			if (elementOrId) {
-				this.setElement(elementOrId);
-			}
-
-			if (!this.hasOwnProperty("options")) {
-				this.options = new Hash();
-			}
-
-			this._initOptions(this.options);
-
-			if (options) {
-				this.options.merge(options);
-			}
-
-			if (!this.delegator) {
-				this.delegator = new dom.events.Delegator();
-			}
-
-			this.delegator.delegate = this;
-			this.delegator.node = this.element;
-
-			if (this.options.actionPrefix) {
-				this.delegator.setActionPrefix(this.options.actionPrefix);
-			}
-
-			this.delegator.init();
-
-			this._initActions();
-			this._initCallbacks();
-			this._initNotifications();
-			this.initElementStore(this.element);
-			this.callbacks.execute("beforeReady");
-			this._ready();
-			this.callbacks.execute("afterReady");
-
-			if (this.options.defaultModule) {
-				this.constructor.getManager().setDefaultModule(this);
-			}
-
-			return this;
-		},
-
-		destructor: function destructor(keepElement) {
-			this.callbacks.execute("beforeDestroy");
-
-			this.constructor.unregister(this);
-			this.destroyElementStore();
-			this.destroyCallbacks();
-
-			if (this.delegator) {
-				this.delegator.destructor();
-			}
-
-			if (!keepElement && this.element) {
-				this.element.parentNode.removeChild(this.element);
-			}
-
-			if (this.options) {
-				this.options.destructor();
-			}
-
-			this.actions = this.element = this.delegator = this.options = this.document = this.window = null;
-		},
-
-		cancel: function cancel(event, element, params) {
-			event.stop();
-			this.destructor();
-			event = element = params = null;
-		},
-
-		_ready: function _ready() {
-
-		},
-
-		_initActions: function _initActions() {
-			// TODO: Actions appear to be merging incorrectly here and making delegator double up on events
-			var actions = new Hash(), proto = this.__proto__;
-
-			while (proto) {
-				if (proto.hasOwnProperty("actions")) {
-					actions.safeMerge(proto.actions);
-				}
-
-				proto = proto.__proto__;
-			}
-
-			this.delegator.setEventActionMapping(actions);
-		},
-
-		_initCallbacks: function _initCallbacks() {
-			var types = new Hash(), proto = this.__proto__;
-
-			while (proto) {
-				if (proto.hasOwnProperty("callbacks")) {
-					types.safeMerge(proto.callbacks);
-				}
-
-				proto = proto.__proto__;
-			}
-
-			this.initCallbacks(types);
-		},
-
-		_initOptions: function _initOptions() {
-			var proto = this.__proto__;
-
-			while (proto) {
-				if (proto.hasOwnProperty("options")) {
-					this.options.safeMerge(proto.options);
-				}
-
-				proto = proto.__proto__;
-			}
-		},
-
-	}
-
-});
-*/
 
 // Make globally available
 g.Module = Module;

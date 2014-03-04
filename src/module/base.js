@@ -15,7 +15,7 @@ Base.unregister = function unregister(module) {
 		return;
 	}
 
-	Module.manager.unregister(module);
+	Module.manager.unregisterModule(module);
 };
 
 Base.prototype = {
@@ -31,7 +31,7 @@ Base.prototype = {
 	constructor: Base,
 
 	initialize: function initialize() {
-		this.guid = _guid++;
+		this.guid = ++_guid;
 		this.options = {};
 	},
 

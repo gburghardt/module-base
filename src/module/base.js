@@ -26,6 +26,8 @@ Base.prototype = {
 
 	guid: null,
 
+	_isLoading: false,
+
 	window: null,
 
 	constructor: Base,
@@ -103,11 +105,13 @@ Base.prototype = {
 
 	_loading: function _loading(element) {
 		(element || this.element).classList.add("loading");
+		this._isLoading = true;
 		element = null;
 	},
 
 	_loaded: function _loaded(element) {
 		(element || this.element).classList.remove("loading");
+		this._isLoading = false;
 		element = null;
 	},
 

@@ -6,11 +6,11 @@ function Base() {
 	this.initialize();
 }
 
-Base.setDefaultModule = function setDefaultModule(module) {
+Base.setDefaultModule = function(module) {
 	Module.manager.setDefaultModule(module);
 };
 
-Base.unregister = function unregister(module) {
+Base.unregister = function(module) {
 	if (!Module.manager) {
 		return;
 	}
@@ -19,6 +19,8 @@ Base.unregister = function unregister(module) {
 };
 
 Base.prototype = {
+
+	controllerId: null,
 
 	document: null,
 
@@ -32,12 +34,12 @@ Base.prototype = {
 
 	constructor: Base,
 
-	initialize: function initialize() {
+	initialize: function() {
 		this.guid = ++_guid;
 		this.options = {};
 	},
 
-	init: function init(elementOrId, options) {
+	init: function(elementOrId, options) {
 		if (elementOrId) {
 			this.setElement(elementOrId);
 		}
@@ -53,7 +55,7 @@ Base.prototype = {
 		return this;
 	},
 
-	destructor: function destructor(keepElement) {
+	destructor: function(keepElement) {
 		Base.unregister(this);
 
 		if (!keepElement && this.element && this.element.parentNode) {
@@ -63,7 +65,7 @@ Base.prototype = {
 		this.element = this.options = this.document = this.window = null;
 	},
 
-	focus: function focus(anything) {
+	focus: function(anything) {
 		var element,
 			typeRegex = /checkbox|radio|submit|button|image|reset/,
 		    selector = [
@@ -103,19 +105,25 @@ Base.prototype = {
 		element = null;
 	},
 
-	_loading: function _loading(element) {
+	_loading: function(element) {
 		(element || this.element).classList.add("loading");
 		this._isLoading = true;
 		element = null;
 	},
 
-	_loaded: function _loaded(element) {
+	_loaded: function(element) {
 		(element || this.element).classList.remove("loading");
 		this._isLoading = false;
 		element = null;
 	},
 
-	setElement: function setElement(elementOrId) {
+	onControllerRegistered: function(frontController, controllerId) {
+	},
+
+	onControllerUnregistered: function(frontController) {
+	},
+
+	setElement: function(elementOrId) {
 		this.element = typeof elementOrId === "string"
 		             ? document.getElementById(elementOrId)
 		             : elementOrId;
@@ -128,7 +136,7 @@ Base.prototype = {
 		this.window = this.document.defaultView || this.document.parentWindow;
 	},
 
-	setOptions: function setOptions(overrides) {
+	setOptions: function(overrides) {
 		for (var key in overrides) {
 			if (overrides.hasOwnProperty(key)) {
 				this.options[key] = overrides[key];

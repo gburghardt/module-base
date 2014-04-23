@@ -79,10 +79,10 @@ describe("Module.Base", function() {
 			module.init(element);
 
 			Module.manager = {
-				unregister: function() {}
+				unregisterModule: function() {}
 			};
 
-			spyOn(Module.manager, "unregister");
+			spyOn(Module.manager, "unregisterModule");
 		});
 
 		afterEach(function() {
@@ -92,7 +92,7 @@ describe("Module.Base", function() {
 		it("unregisters the module", function() {
 			module.destructor();
 
-			expect(Module.manager.unregister).toHaveBeenCalledWith(module);
+			expect(Module.manager.unregisterModule).toHaveBeenCalledWith(module);
 		});
 
 		it("removes the root element", function() {
@@ -130,6 +130,7 @@ describe("Module.Base", function() {
 	describe("focus", function() {
 
 		beforeEach(function() {
+			module = new Module.Base();
 			module.init(element);
 		});
 

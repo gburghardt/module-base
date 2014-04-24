@@ -1,6 +1,6 @@
 {
 	"name": "module-base",
-	"description": "",
+	"description": "A base module class for Web Applications.",
 	"authors": [
 		"Greg Burghardt <greg_burghardt@yahoo.com>"
 	],

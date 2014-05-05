@@ -1,4 +1,6 @@
-(function(g, Module) {
+(function(global) {
+
+global.Module = global.Module || {};
 
 var _guid = 0;
 
@@ -148,9 +150,6 @@ Base.prototype = {
 
 };
 
-Module.Base = Base;
+global.Module.Base = Base;
 
-// Make globally available
-g.Module = Module;
-
-})(this, this.Module || {});
+})(this);
